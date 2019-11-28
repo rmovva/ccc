@@ -81,6 +81,44 @@ class ReLU(Layer):
             raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
         return dY * (self.cache_in >= 0), []
 
+class BatchNorm(layer):
+    def __init__(self, input_dim, momentum = 0.1):
+        '''
+        Performs a mean-only batch normalization (y = BN(x)) on a given input x = (x1, ..., xN).
+        Normalization is computed for each xk (k=1..N) independently, using batch statistics.
+        xhat = x - E_batch[x]
+        y = xhat + beta
+
+        At inference time, we subtract off a dataset-wide mean, which we can estimate by tracking a running mean:
+        running_mean = (1 - momentum)*running_mean + momentum*E_batch[x]
+        Here we use a default momentum of 0.1.
+        '''
+        self.input_dim = input_dim
+        self.beta = np.zeros((1, input_dim))
+        self.running_mean = np.zeros((1, input_dim))
+        self.momentum = momentum
+
+    def forward(self, X, train=True):
+        # X shape: (batch_size, input_dim)
+        if train:
+            batch_mean = np.mean(X, axis=0, keepdims=True)
+            self.running_mean = (1 - self.momentum)*self.running_mean + self.momentum*batch_mean
+            Xhat = X - batch_mean
+            Y = Xhat + self.beta
+            return Y
+        else:
+            return X - self.running_mean + self.beta
+
+    def backward(self, dY):
+        # dY shape: (batch_size, input_dim)
+        # dYdbeta = 1
+        dbeta = np.sum(dY, axis=0, keepdims=True)
+        # dLdx = dLdY * dYdXhat * dXhatdX
+        batch_size = dY.shape[0]
+        dXhat = dY
+        dX = (1 - 1 / batch_size) * dXhat
+        return dX, [(self.beta, dbeta)]
+
 class Loss(object):
     '''
     Abstract class representing a loss function
