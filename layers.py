@@ -81,7 +81,7 @@ class ReLU(Layer):
             raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
         return dY * (self.cache_in >= 0), []
 
-class BatchNorm(layer):
+class BatchNorm(Layer):
     def __init__(self, input_dim, momentum = 0.1):
         '''
         Performs a mean-only batch normalization (y = BN(x)) on a given input x = (x1, ..., xN).
