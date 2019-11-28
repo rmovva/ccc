@@ -1,6 +1,14 @@
 # mnist-numpy
 A basic fully connected network implemented purely in NumPy and trained on the MNIST dataset.
 
+## Mean-only BatchNorm implementation
+
+We implement mean-only batch normalization, in which the batch-wise mean of an input x is subtracted to compute the output y = BN(x). This computation is implemented as a layer module in layers.py, and layers are added to the defined network in main.py. We demonstrate accuracy of the forward and backward pass of this layer in test_pass.py.
+
+We make a couple design choices, notably keeping track of our dataset-wide "running mean" by using a momentum of 0.1. This running mean is used at inference time in place of our batch-wise means. We also include trainable parameters "beta" for each channel in our input x, allowing for a constant shift of our output y (and thereby allowing the BatchNorm layer to e.g. learn the identity function).
+
+We test our BatchNorm layer using pytest. We write two forward pass test cases with zero and nonzero beta. We test the layer's ability to correct propagate gradients backward by comparing the analytic gradient to the expected, manually calculated gradient.
+
 ## Experiments
 The MNIST dataset is split into 50000 train, 10000 validation and 10000 test samples. All splits are normalized using the statistics of the training split (using the global mean and standard deviation, not per pixel).
 
