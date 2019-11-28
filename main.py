@@ -8,7 +8,7 @@ def main():
     '''
     Trains two networks on the MNIST dataset.
     Both have two hidden ReLU layers with 256 and 128 units
-    The fist one has a mean batch normalization layer before every layer
+    The first one has a mean batch normalization layer before every layer
     '''
     np.random.seed(42)
     n_classes = 10
@@ -18,10 +18,13 @@ def main():
 
     # Define network without batch norm
     net = Network(learning_rate = 1e-3)
+    net.add_layer(BatchNorm(dim))
     net.add_layer(Linear(dim, 256))
     net.add_layer(ReLU())
+    net.add_layer(BatchNorm(256))
     net.add_layer(Linear(256, 128))
     net.add_layer(ReLU())
+    net.add_layer(BatchNorm(128))
     net.add_layer(Linear(128, n_classes))
     net.set_loss(SoftmaxCrossEntropyLoss())
 
