@@ -1,4 +1,3 @@
-import pytest
 import numpy as np
 from layers import BatchNorm
 
@@ -8,8 +7,7 @@ def test1():
 	We use epsilon = 0.0001 as our small input perturbation.
 	'''
 	bn = BatchNorm(3)
-	X = np.array([[1, 2, 3],
-				  [3, 4, 5]])
+	X = np.array([[1, 2, 3], [3, 4, 5]])
 
 	eps = 0.0001*np.random.random(X.shape)
 	X_plus = X + eps
